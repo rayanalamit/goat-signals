@@ -46,12 +46,23 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .next-refresh span{color:var(--yellow);font-weight:700}
 
 /* ─── ACTION BUTTONS ─── */
-.action-btns{display:flex;gap:8px;align-items:center}
+.action-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .notif-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .notif-btn:hover{border-color:var(--green);color:var(--green)}
 .notif-btn.active{background:#00ff8820;border-color:var(--green);color:var(--green)}
 .install-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #a78bfa55;background:#a78bfa15;color:var(--purple);cursor:pointer;display:none;align-items:center;gap:5px;white-space:nowrap}
 .install-btn:hover{background:#a78bfa25}
+.refresh-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #00ff8855;background:#00ff8815;color:var(--green);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.refresh-btn:hover{background:#00ff8830;border-color:var(--green)}
+.refresh-btn:active{transform:scale(.95)}
+.refresh-btn.spinning svg{animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.freeze-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #ffd70055;background:transparent;color:var(--yellow);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.freeze-btn:hover{background:#ffd70015}
+.freeze-btn.frozen{background:#ffd70020;border-color:var(--yellow);color:var(--yellow)}
+.pairs-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.pairs-btn:hover{border-color:var(--purple);color:var(--purple)}
+.pairs-btn.active{background:#a78bfa20;border-color:var(--purple);color:var(--purple)}
 
 /* ─── STATS ─── */
 .stats{padding:10px 20px 0;display:flex;gap:20px;flex-wrap:wrap}
@@ -212,6 +223,12 @@ footer span{color:var(--yellow)}
     <div class="clock" id="clock">--:--:--</div>
     <div class="next-refresh">Refresh in <span id="countdown">4:00</span></div>
     <div class="action-btns">
+      <button class="refresh-btn" id="refresh-btn" onclick="manualRefresh()" title="Refresh signals now">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Refresh
+      </button>
+      <button class="freeze-btn" id="freeze-btn" onclick="toggleFreeze()" title="Freeze / resume auto-refresh">❄️ Freeze</button>
+      <button class="pairs-btn" id="pairs-btn" onclick="toggleAllPairs()" title="Show / hide all 11 pairs">📊 All Pairs</button>
       <button class="notif-btn" id="notif-btn" onclick="toggleNotifications()">🔔 Alerts OFF</button>
       <button class="install-btn" id="install-btn" onclick="installPWA()">📱 Install App</button>
     </div>
@@ -815,6 +832,48 @@ function refreshSignals(){
 // ══════════════════════════════════════════════════════════════════
 const REFRESH_SECS=240;
 let timeLeft=REFRESH_SECS;
+let frozen=false;
+let showAllPairs=true; // default: show all 11
+
+function manualRefresh(){
+  const btn=document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  setTimeout(()=>{ btn.classList.remove('spinning'); },600);
+  window.location.reload();
+}
+
+function toggleFreeze(){
+  frozen=!frozen;
+  const btn=document.getElementById('freeze-btn');
+  const bar=document.getElementById('refresh-bar');
+  if(frozen){
+    btn.classList.add('frozen');
+    btn.textContent='▶ Active';
+    bar.style.background='var(--yellow)';
+    document.getElementById('countdown').style.color='var(--yellow)';
+  } else {
+    btn.classList.remove('frozen');
+    btn.innerHTML='❄️ Freeze';
+    bar.style.background='var(--green)';
+    document.getElementById('countdown').style.color='';
+  }
+}
+
+function toggleAllPairs(){
+  showAllPairs=!showAllPairs;
+  const btn=document.getElementById('pairs-btn');
+  if(showAllPairs){
+    btn.classList.add('active');
+    btn.textContent='📊 All Pairs ON';
+    // switch to ALL filter
+    setFilter('ALL', document.getElementById('btn-ALL'));
+  } else {
+    btn.classList.remove('active');
+    btn.textContent='📊 All Pairs';
+    // switch to HIGH filter
+    setFilter('HIGH', document.getElementById('btn-HIGH'));
+  }
+}
 
 function pad(n){return String(n).padStart(2,'0');}
 
@@ -822,8 +881,9 @@ function tick(){
   const now=new Date();
   const italyTime=now.toLocaleTimeString('en-US',{timeZone:'Europe/Rome',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
   document.getElementById('clock').textContent=`${italyTime} IT`;
-  timeLeft--; signalAge++;
-  if(timeLeft<=0){ window.location.reload(); return; }
+  if(!frozen){ timeLeft--; }
+  signalAge++;
+  if(!frozen && timeLeft<=0){ window.location.reload(); return; }
   const mm=Math.floor(timeLeft/60),ss=timeLeft%60;
   document.getElementById('countdown').textContent=`${mm}:${pad(ss)}`;
   document.getElementById('refresh-bar').style.width=(timeLeft/REFRESH_SECS*100)+'%';
@@ -863,6 +923,8 @@ function tick(){
 // Set generatedAt on initial load
 (()=>{ const t=Date.now(); SIGNALS.forEach(s=>{ s.generatedAt=t; }); })();
 rebuildGrid();
+// Init All Pairs button state
+(()=>{ const b=document.getElementById('pairs-btn'); if(b){b.classList.add('active');b.textContent='📊 All Pairs ON';} })();
 // Flash "NEW SIGNALS" banner on load so user knows it just refreshed
 (()=>{
   const b=document.createElement('div');
