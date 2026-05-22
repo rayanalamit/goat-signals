@@ -239,11 +239,22 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .card.pair-off .pair-toggle{pointer-events:all;opacity:1;filter:none}
 
 /* ─── EXPIRY ─── */
-.expiry-row{display:flex;align-items:center;justify-content:space-between;margin:6px 0 4px;padding:5px 8px;border-radius:4px;background:#0d1117;font-family:monospace;font-size:9px}
-.expiry-label{color:var(--dim);letter-spacing:.5px}
-.expiry-time{color:var(--yellow);font-weight:700;font-size:10px}
-.expiry-bar-wrap{width:100%;height:3px;background:#21262d;border-radius:2px;overflow:hidden;margin-bottom:6px}
-.expiry-bar{height:100%;border-radius:2px;transition:width 60s linear}
+.expiry-row{
+  margin:8px 0 5px;padding:8px 12px;border-radius:6px;
+  background:linear-gradient(135deg,#0d1117,#111820);
+  border:1px solid #21262d88;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.expiry-left{display:flex;flex-direction:column;gap:2px}
+.expiry-label{font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.expiry-until{font-size:9px;color:var(--muted);font-family:monospace}
+.expiry-countdown{
+  font-family:monospace;font-size:18px;font-weight:900;
+  letter-spacing:2px;min-width:70px;text-align:right;
+  transition:color .3s;
+}
+.expiry-bar-wrap{width:100%;height:4px;background:#21262d;border-radius:2px;overflow:hidden;margin-bottom:6px}
+.expiry-bar{height:100%;border-radius:2px;transition:width 1s linear}
 .card.expired{opacity:.55;filter:grayscale(.6)}
 .expired-badge{display:inline-block;background:#ff3b5b22;border:1px solid #ff3b5b66;color:#ff3b5b;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle}
 
@@ -1027,13 +1038,14 @@ function buildCard(d,idx){
       if(pos) html+=`<div class="pos-calc"><span class="pos-calc-label">💰 POSITION SIZE (${pos.riskPct}% risk)</span><span class="pos-calc-val">${pos.lots} lots · $${pos.riskAmt}</span></div>`;
       return html;
     })()}
-    ${exStr ? `
     <div class="expiry-row">
-      <span class="expiry-label">⏰ VALID UNTIL</span>
-      <span class="expiry-time" id="expiry-${idx}">${expired?'<span style="color:var(--red)">EXPIRED</span>':exStr+' IT'}</span>
+      <div class="expiry-left">
+        <span class="expiry-label">⏰ Signal expires</span>
+        <span class="expiry-until" id="expiry-${idx}">${expired?'<span style="color:var(--red)">EXPIRED</span>':(exStr?exStr+' IT':'—')}</span>
+      </div>
+      <span class="expiry-countdown" id="ecdwn-${idx}" style="color:${eColor}">${expired?'DONE':''}</span>
     </div>
     <div class="expiry-bar-wrap"><div class="expiry-bar" id="ebar-${idx}" style="width:${ePct}%;background:${eColor}"></div></div>
-    ` : ''}
     <div>
       <button class="reasons-toggle" onclick="toggleReasons(${idx},this)">
         <span>WHY THIS SIGNAL?</span>
@@ -1309,29 +1321,33 @@ function tick(){
   document.getElementById('countdown').textContent=`${mm}:${pad(ss)}`;
   document.getElementById('refresh-bar').style.width=(timeLeft/REFRESH_SECS*100)+'%';
   SIGNALS.forEach((d,i)=>{
-    // age label
+    // age label (top-right of card)
     const el=document.getElementById('age-'+i);
     if(el){const m=Math.floor(signalAge/60);el.textContent=m===0?'Just now':m===1?'1 min ago':m+' mins ago';}
-    // expiry bar + label live update
+    // live expiry countdown per card
     if(d.generatedAt&&d.validMins){
-      const pct=expiryPct(d);
+      const msLeft=d.generatedAt+d.validMins*60000-Date.now();
+      const expired=msLeft<=0;
+      const pct=Math.max(0,Math.min(100,msLeft/(d.validMins*60000)*100));
+      const eColor=pct>50?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
       const bar=document.getElementById('ebar-'+i);
       const lbl=document.getElementById('expiry-'+i);
+      const cdwn=document.getElementById('ecdwn-'+i);
       const card=document.getElementById('card-'+i);
-      const expired=isExpired(d);
-      if(bar){
-        bar.style.width=pct+'%';
-        bar.style.background=pct>50?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
-      }
-      if(lbl){
-        if(expired){
-          lbl.innerHTML='<span style="color:var(--red);animation:pulse 1s infinite">EXPIRED</span>';
-          if(card) card.classList.add('expired');
-        } else {
+      if(bar){ bar.style.width=pct+'%'; bar.style.background=eColor; }
+      if(expired){
+        if(lbl) lbl.innerHTML='<span style="color:var(--red)">EXPIRED</span>';
+        if(cdwn){ cdwn.textContent='DONE'; cdwn.style.color='var(--red)'; }
+        if(card) card.classList.add('expired');
+      } else {
+        const totSecs=Math.ceil(msLeft/1000);
+        const mm=Math.floor(totSecs/60), ss=totSecs%60;
+        const cdwnTxt=`${mm}:${pad(ss)}`;
+        if(cdwn){ cdwn.textContent=cdwnTxt; cdwn.style.color=eColor; }
+        if(lbl){
           const exp=new Date(d.generatedAt+d.validMins*60000);
           const ts=exp.toLocaleTimeString('en-US',{timeZone:'Europe/Rome',hour:'numeric',minute:'2-digit',hour12:true});
-          const minsLeft=Math.ceil((d.generatedAt+d.validMins*60000-Date.now())/60000);
-          lbl.innerHTML=`${ts} IT <span style="color:var(--dim);font-size:8px">(${minsLeft}m left)</span>`;
+          lbl.textContent=ts+' IT';
         }
       }
     }
@@ -1341,15 +1357,12 @@ function tick(){
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
-// Set generatedAt on initial load
-(()=>{ const t=Date.now(); SIGNALS.forEach(s=>{ s.generatedAt=t; }); })();
-rebuildGrid();
+// Init — run full refresh (rotates confidence, sets generatedAt, builds grid)
+refreshSignals();
 // Init All Pairs button state
 (()=>{ const b=document.getElementById('pairs-btn'); if(b){b.classList.add('active');b.textContent='📊 All Pairs ON';} })();
 // Init sessions
 updateSessions();
-// Init Groq key check
-checkGroqKey();
 // Build rec-items banner with ALL pairs
 updateRecItems();
 // Flash "NEW SIGNALS" banner on load so user knows it just refreshed
