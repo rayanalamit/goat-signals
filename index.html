@@ -155,6 +155,15 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .wait-box{background:#0d1117;border-radius:4px;padding:8px 10px;font-size:10px;font-family:monospace;color:var(--yellow);line-height:1.6}
 .wait-box small{color:var(--dim);font-size:9px;display:block;margin-top:3px}
 
+/* ─── EXPIRY ─── */
+.expiry-row{display:flex;align-items:center;justify-content:space-between;margin:6px 0 4px;padding:5px 8px;border-radius:4px;background:#0d1117;font-family:monospace;font-size:9px}
+.expiry-label{color:var(--dim);letter-spacing:.5px}
+.expiry-time{color:var(--yellow);font-weight:700;font-size:10px}
+.expiry-bar-wrap{width:100%;height:3px;background:#21262d;border-radius:2px;overflow:hidden;margin-bottom:6px}
+.expiry-bar{height:100%;border-radius:2px;transition:width 60s linear}
+.card.expired{opacity:.55;filter:grayscale(.6)}
+.expired-badge{display:inline-block;background:#ff3b5b22;border:1px solid #ff3b5b66;color:#ff3b5b;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle}
+
 /* ─── REASONS ─── */
 .reasons-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:0;border:none;background:none;width:100%;color:var(--dim);font-size:9px;letter-spacing:1px;text-transform:uppercase}
 .reasons-toggle:hover{color:var(--muted)}
@@ -196,7 +205,7 @@ footer span{color:var(--yellow)}
     <div class="pulse"></div>
     <div>
       <div class="site-title">GOAT SIGNALS</div>
-      <div class="site-sub">GOAT Funded · 1H Analysis · 12 Instruments · 8–10 Conf Only</div>
+      <div class="site-sub">GOAT Funded · 1H Analysis · 11 Instruments · 8–10 Conf Only</div>
     </div>
   </div>
   <div class="header-right">
@@ -381,51 +390,47 @@ footer span{color:var(--yellow)}
 // SIGNAL DATA
 // ══════════════════════════════════════════════════════════════════
 const BASE=[
- {mt5:'USDJPY',name:'USD/JPY',price:159.08,sig:'SELL',conf:8,glow:'#ff3b5b',
+ {mt5:'USDJPY',name:'USD/JPY',price:159.08,sig:'SELL',conf:8,glow:'#ff3b5b',validMins:120,
   entry:159.10,sl:159.35,tp1:158.60,tp2:158.20,rr:'1:2.4',
   reasons:['Lower highs: 159.25 → 159.18 → 159.11 (4H downtrend confirmed)','RSI(14) = 62 rolling over — was at overbought 74 two sessions ago','Hard rejection at 159.10 resistance — 3 failed attempts to break','Tokyo session adding sell pressure — JPY demand spiking','DXY (Dollar Index) weakening → USD/JPY follows lower'],
   c:[[1779231600,159.04,159.17,158.92,158.87],[1779235200,158.84,158.91,158.84,158.84],[1779238800,158.83,158.93,158.83,158.83],[1779242400,158.92,158.96,158.85,158.88],[1779246000,158.83,158.90,158.79,158.84],[1779249600,158.85,158.93,158.80,158.86],[1779253200,158.88,158.90,158.81,158.90],[1779256800,158.84,158.92,158.84,158.89],[1779260400,158.84,158.92,158.83,158.83],[1779264000,158.88,158.93,158.84,158.89],[1779267600,158.87,158.90,158.86,158.86],[1779271200,158.89,158.98,158.89,158.97],[1779274800,158.98,158.99,158.94,158.96],[1779278400,158.96,159.00,158.97,159.00],[1779282000,158.99,159.05,158.98,159.01],[1779285600,159.01,159.07,158.99,159.06],[1779289200,159.06,159.09,158.90,159.03],[1779292800,159.03,159.03,158.90,158.97],[1779296400,158.98,158.99,158.95,158.97],[1779300000,158.97,159.00,158.95,159.13],[1779303600,159.12,159.10,159.07,159.08],[1779307200,159.08,159.08,158.95,159.08]]},
- {mt5:'EURGBP',name:'EUR/GBP',price:0.8644,sig:'SELL',conf:8,glow:'#ff3b5b',
+ {mt5:'EURGBP',name:'EUR/GBP',price:0.8644,sig:'SELL',conf:8,glow:'#ff3b5b',validMins:120,
   entry:0.8650,sl:0.8678,tp1:0.8615,tp2:0.8590,rr:'1:2.1',
   reasons:['18-hour clean bearish channel: 0.8703 → 0.8643 (-60 pips)','Multiple rejections at 0.8655 — strong supply zone confirmed','GBP outperforming EUR on all crosses today','RSI(14) = 41, room to fall to 30 before oversold','No EUR catalyst expected — momentum favors shorts'],
   c:[[1779145200,0.8703,0.8704,0.8697,0.8698],[1779148800,0.8697,0.8703,0.8696,0.8701],[1779152400,0.8701,0.8702,0.8690,0.8691],[1779156000,0.8691,0.8694,0.8677,0.8681],[1779159600,0.8681,0.8682,0.8665,0.8676],[1779163200,0.8676,0.8678,0.8672,0.8677],[1779166800,0.8677,0.8677,0.8673,0.8675],[1779170400,0.8675,0.8679,0.8671,0.8675],[1779174000,0.8678,0.8683,0.8674,0.8681],[1779177600,0.8681,0.8687,0.8665,0.8666],[1779181200,0.8668,0.8670,0.8664,0.8668],[1779184800,0.8666,0.8667,0.8664,0.8665],[1779188400,0.8664,0.8669,0.8657,0.8659],[1779192000,0.8657,0.8665,0.8655,0.8662],[1779195600,0.8660,0.8666,0.8656,0.8660],[1779199200,0.8660,0.8661,0.8658,0.8658],[1779202800,0.8658,0.8661,0.8655,0.8656],[1779206400,0.8656,0.8657,0.8654,0.8662],[1779210000,0.8660,0.8664,0.8657,0.8660],[1779213600,0.8660,0.8661,0.8660,0.8661],[1779217200,0.8662,0.8664,0.8658,0.8659],[1779220800,0.8659,0.8665,0.8656,0.8656],[1779224400,0.8656,0.8659,0.8654,0.8654],[1779228000,0.8654,0.8655,0.8649,0.8649],[1779231600,0.8649,0.8655,0.8642,0.8643]]},
- {mt5:'NAS100.CASH',name:'NAS100.CASH',price:29253,sig:'BUY',conf:8,glow:'#00ff88',
+ {mt5:'NAS100.CASH',name:'NAS100.CASH',price:29253,sig:'BUY',conf:8,glow:'#00ff88',validMins:120,
   entry:29200,sl:28900,tp1:29500,tp2:29750,rr:'1:1.8',
   reasons:['Higher lows intact on 4H: 28620 → 28900 → 29100 (uptrend)','Broke above key resistance at 29,200 with strong volume candle','RSI(14) = 58 — bullish momentum building, not overbought yet','Tech sector broad strength (AAPL, NVDA, MSFT all up today)','52-week high at 29,782 within reach — momentum target'],
   c:[[1779188400,28930,28985,28905,28960],[1779192000,28960,29020,28945,29005],[1779195600,29005,29050,28985,29030],[1779199200,29030,29080,29010,29065],[1779202800,29065,29120,29045,29100],[1779206400,29100,29160,29085,29145],[1779210000,29145,29190,29120,29175],[1779213600,29175,29220,29150,29200],[1779217200,29200,29260,29180,29245],[1779220800,29245,29310,29225,29290],[1779224400,29290,29350,29270,29330],[1779228000,29330,29400,29310,29385],[1779231600,29385,29465,29360,29450],[1779235200,29450,29480,29390,29420],[1779238800,29420,29440,29360,29375],[1779242400,29375,29390,29310,29330],[1779246000,29330,29360,29290,29345],[1779249600,29345,29380,29315,29365],[1779253200,29365,29395,29340,29380],[1779256800,29380,29410,29355,29395],[1779260400,29395,29420,29370,29408],[1779264000,29408,29440,29395,29430],[1779267600,29430,29465,29415,29450],[1779271200,29450,29465,29420,29438],[1779278400,29438,29460,29410,29253]]},
- {mt5:'EURUSD',name:'EUR/USD',price:1.1613,sig:'SELL',conf:6,glow:'#ff3b5b',
+ {mt5:'EURUSD',name:'EUR/USD',price:1.1613,sig:'SELL',conf:6,glow:'#ff3b5b',validMins:150,
   entry:1.1640,sl:1.1670,tp1:1.1600,tp2:1.1570,rr:'1:2.3',
   reasons:['4H lower highs: 1.1672 → 1.1658 → 1.1640 (bearish structure)','Failed to hold above 1.1640 — now acting as resistance','RSI(14) declining from 58 to 49 — bearish divergence','EUR fundamentally weak — ECB dovish bias remains','Enter only on bounce to 1.1640 — wait for it'],
   c:[[1779200400,1.1616,1.1617,1.1605,1.1600],[1779204000,1.1605,1.1610,1.1597,1.1601],[1779207600,1.1610,1.1616,1.1606,1.1610],[1779211200,1.1608,1.1609,1.1602,1.1609],[1779214800,1.1609,1.1612,1.1607,1.1611],[1779218400,1.1610,1.1610,1.1605,1.1610],[1779222000,1.1605,1.1605,1.1597,1.1605],[1779225600,1.1601,1.1606,1.1600,1.1602],[1779229200,1.1600,1.1606,1.1600,1.1605],[1779232800,1.1601,1.1601,1.1596,1.1601],[1779236400,1.1598,1.1604,1.1598,1.1597],[1779240000,1.1600,1.1609,1.1596,1.1594],[1779243600,1.1596,1.1594,1.1587,1.1594],[1779247200,1.1592,1.1606,1.1592,1.1605],[1779250800,1.1604,1.1608,1.1597,1.1604],[1779254400,1.1605,1.1598,1.1598,1.1597],[1779258000,1.1598,1.1627,1.1593,1.1624],[1779261600,1.1623,1.1623,1.1617,1.1623],[1779265200,1.1628,1.1628,1.1623,1.1628],[1779268800,1.1620,1.1620,1.1620,1.1623],[1779272400,1.1635,1.1639,1.1631,1.1631],[1779276000,1.1631,1.1637,1.1627,1.1629],[1779279600,1.1627,1.1632,1.1625,1.1629],[1779283200,1.1629,1.1639,1.1629,1.1639],[1779286800,1.1628,1.1632,1.1627,1.1631]]},
- {mt5:'AUDUSD',name:'AUD/USD',price:0.7130,sig:'BUY',conf:6,glow:'#00ff88',
+ {mt5:'AUDUSD',name:'AUD/USD',price:0.7130,sig:'BUY',conf:6,glow:'#00ff88',validMins:150,
   entry:0.7110,sl:0.7075,tp1:0.7155,tp2:0.7180,rr:'1:2.0',
   reasons:['RSI(14) hit 27 — extreme oversold on 1H (rare reading)','Sharp drop 0.7187 → 0.7084 = 103 pips, severely overextended','4H support at 0.7084–0.7100 holding so far','AUD fundamentals stable — China PMI beat expectations','Bounce in progress — enter pullback to 0.7110'],
   c:[[1779163200,0.7143,0.7147,0.7130,0.7140],[1779166800,0.7139,0.7141,0.7128,0.7132],[1779170400,0.7134,0.7136,0.7128,0.7134],[1779174000,0.7133,0.7138,0.7133,0.7137],[1779177600,0.7134,0.7139,0.7129,0.7129],[1779181200,0.7126,0.7128,0.7120,0.7121],[1779184800,0.7118,0.7118,0.7113,0.7118],[1779188400,0.7118,0.7123,0.7113,0.7118],[1779192000,0.7121,0.7123,0.7117,0.7120],[1779195600,0.7117,0.7126,0.7104,0.7119],[1779199200,0.7116,0.7117,0.7104,0.7114],[1779202800,0.7111,0.7111,0.7084,0.7087],[1779206400,0.7088,0.7102,0.7086,0.7102],[1779210000,0.7104,0.7114,0.7099,0.7113],[1779213600,0.7114,0.7118,0.7114,0.7116],[1779217200,0.7116,0.7117,0.7109,0.7109],[1779220800,0.7111,0.7113,0.7108,0.7111],[1779224400,0.7109,0.7113,0.7108,0.7109],[1779228000,0.7110,0.7111,0.7107,0.7111],[1779231600,0.7109,0.7115,0.7107,0.7110],[1779235200,0.7110,0.7106,0.7095,0.7107],[1779238800,0.7103,0.7103,0.7091,0.7095],[1779242400,0.7096,0.7107,0.7098,0.7103],[1779246000,0.7105,0.7108,0.7097,0.7099],[1779249600,0.7097,0.7101,0.7097,0.7106]]},
- {mt5:'CHFJPY',name:'CHF/JPY',price:201.41,sig:'BUY',conf:6,glow:'#00ff88',
-  entry:201.40,sl:200.85,tp1:202.15,tp2:202.60,rr:'1:2.2',
-  reasons:['Dropped 157 pips from 202.59 to 201.02 in 6 hours — oversold','Support at 201.00–201.20 holding on 3 tests','RSI(14) = 32 bouncing from oversold, bullish divergence','SNB not intervening — CHF naturally supported','Risk-on environment today favors bounce'],
-  c:[[1779163200,202.36,202.59,202.34,202.35],[1779166800,202.51,202.57,202.40,202.51],[1779170400,202.48,202.57,202.40,202.49],[1779174000,202.47,202.57,202.37,202.49],[1779177600,202.45,202.50,202.30,202.45],[1779181200,202.32,202.46,202.26,202.33],[1779184800,202.27,202.34,202.22,202.29],[1779188400,202.29,202.46,202.22,202.29],[1779192000,202.42,202.52,202.33,202.40],[1779195600,202.40,202.56,202.37,202.51],[1779199200,202.51,202.54,202.14,202.22],[1779202800,202.23,202.24,201.97,202.10],[1779206400,202.10,202.22,202.01,202.14],[1779210000,202.01,202.12,201.46,201.88],[1779213600,201.89,201.92,201.37,201.59],[1779217200,201.57,201.63,201.13,201.21],[1779220800,201.47,201.51,201.21,201.47],[1779224400,201.28,201.43,201.05,201.28],[1779228000,201.41,201.58,201.28,201.42],[1779231600,201.52,201.61,201.41,201.52],[1779235200,201.60,201.67,201.50,201.57],[1779238800,201.57,201.68,201.59,201.66],[1779242400,201.62,201.72,201.39,201.61],[1779246000,201.62,201.67,201.58,201.60],[1779249600,201.40,201.46,201.39,201.41]]},
- {mt5:'EURJPY',name:'EUR/JPY',price:184.97,sig:'SELL',conf:6,glow:'#ff3b5b',
+ {mt5:'EURJPY',name:'EUR/JPY',price:184.97,sig:'SELL',conf:6,glow:'#ff3b5b',validMins:150,
   entry:185.05,sl:185.30,tp1:184.50,tp2:184.10,rr:'1:3.0',
   reasons:['Bearish engulfing candle at 185.21 resistance on 4H','4 consecutive declining 1H closes after rejection','EUR weak + JPY strengthening = double sell pressure','RSI(14) = 54 declining — room to fall to 40','Target: 184.10 support (previous consolidation base)'],
   c:[[1779124800,185.01,185.21,184.95,185.18],[1779128400,185.18,185.20,185.10,185.10],[1779132000,185.10,185.13,184.98,184.98],[1779135600,184.99,185.14,184.99,185.11],[1779139200,185.12,185.20,185.05,185.08],[1779142800,185.06,185.18,184.95,185.01],[1779146400,185.06,185.17,185.04,185.15],[1779150000,185.15,185.18,185.11,185.15],[1779153600,185.15,185.21,185.09,185.16],[1779157200,185.15,185.17,185.10,185.15],[1779160800,185.15,185.10,185.07,185.08],[1779164400,185.08,185.05,185.04,185.04],[1779168000,185.04,185.14,184.98,185.01],[1779171600,185.12,185.18,185.07,185.11],[1779175200,185.10,185.16,184.99,185.10],[1779178800,185.04,185.05,184.91,185.04],[1779182400,184.97,184.98,184.81,184.97],[1779186000,184.82,185.01,184.82,184.98],[1779189600,184.98,185.02,184.87,184.93],[1779193200,184.93,185.00,184.83,184.88],[1779196800,184.90,184.97,184.80,184.95],[1779200400,184.95,185.01,184.90,185.00],[1779204000,185.00,185.07,184.92,184.98],[1779207600,184.98,185.05,184.96,185.02],[1779211200,185.02,185.07,184.98,185.03]]},
- {mt5:'GBPJPY',name:'GBP/JPY',price:213.10,sig:'SELL',conf:5,glow:'#ff3b5b',
+ {mt5:'GBPJPY',name:'GBP/JPY',price:213.10,sig:'SELL',conf:5,glow:'#ff3b5b',validMins:150,
   entry:213.35,sl:213.65,tp1:212.75,tp2:212.30,rr:'1:2.7',
   reasons:['Consolidating at 213.00–213.50 resistance zone (top of range)','Failed to push above 213.50 twice in last 8 hours','JPY strengthening broadly across all pairs','RSI(14) = 55 at resistance — historical turn point','Medium conf — wait for rejection candle before entering'],
   c:[[1779166800,213.15,213.51,212.84,213.27],[1779170400,213.33,213.30,212.96,213.15],[1779174000,213.15,213.20,212.90,213.03],[1779177600,213.15,213.25,212.95,213.19],[1779181200,213.12,213.20,212.63,212.80],[1779184800,213.30,213.02,212.80,213.00],[1779188400,213.29,213.18,213.00,213.07],[1779192000,213.29,213.17,213.07,213.13],[1779195600,213.26,213.21,213.01,213.02],[1779199200,213.15,213.19,212.92,213.12],[1779202800,213.03,213.17,213.03,213.08],[1779206400,213.20,213.13,212.85,213.04],[1779210000,212.80,213.14,212.77,212.87],[1779213600,213.00,212.94,212.75,212.89],[1779217200,213.07,212.94,212.76,212.80],[1779220800,213.14,212.94,212.82,212.88],[1779224400,213.03,212.96,212.81,212.88],[1779228000,213.10,212.96,212.58,212.87],[1779231600,213.09,213.00,212.74,212.81],[1779235200,213.04,212.99,212.78,212.91],[1779238800,212.87,213.00,212.81,212.82],[1779242400,212.89,212.95,212.83,212.87],[1779246000,212.80,213.03,212.98,212.99],[1779249600,212.87,213.17,213.02,213.10]]},
- {mt5:'GBPUSD',name:'GBP/USD',price:1.3432,sig:'WAIT',conf:3,glow:'#ffd700',
+ {mt5:'GBPUSD',name:'GBP/USD',price:1.3432,sig:'WAIT',conf:3,glow:'#ffd700',validMins:240,
   entry:null,sl:null,tp1:null,tp2:null,rr:'—',waitRange:'1.3400–1.3462',
   reasons:['48H tight 62-pip range — zero directional bias','RSI(14) = 50.2 — perfectly neutral, no signal','BUY above 1.3462 confirmed close / SELL below 1.3400','Do not try to predict the breakout direction','Wait for a strong candle close outside the range'],
   c:[[1779249600,1.3432,1.3462,1.3422,1.3434],[1779253200,1.3434,1.3444,1.3391,1.3435],[1779256800,1.3435,1.3441,1.3398,1.3430],[1779260400,1.3430,1.3453,1.3407,1.3435],[1779264000,1.3431,1.3435,1.3414,1.3434],[1779267600,1.3434,1.3435,1.3410,1.3435],[1779271200,1.3435,1.3435,1.3415,1.3437],[1779274800,1.3437,1.3437,1.3420,1.3437],[1779278400,1.3437,1.3437,1.3430,1.3438],[1779282000,1.3438,1.3438,1.3432,1.3438],[1779285600,1.3437,1.3444,1.3435,1.3437],[1779289200,1.3437,1.3439,1.3433,1.3434],[1779292800,1.3434,1.3439,1.3430,1.3435],[1779296400,1.3435,1.3439,1.3430,1.3431],[1779300000,1.3432,1.3434,1.3428,1.3425],[1779303600,1.3425,1.3446,1.3425,1.3443],[1779307200,1.3443,1.3446,1.3434,1.3438],[1779310800,1.3443,1.3443,1.3434,1.3449],[1779314400,1.3448,1.3449,1.3439,1.3438],[1779318000,1.3438,1.3448,1.3434,1.3441],[1779321600,1.3441,1.3441,1.3436,1.3437],[1779325200,1.3437,1.3444,1.3435,1.3437],[1779328800,1.3437,1.3437,1.3430,1.3438],[1779332400,1.3438,1.3445,1.3432,1.3439],[1779336000,1.3439,1.3439,1.3426,1.3440]]},
- {mt5:'USDCAD',name:'USD/CAD',price:1.3748,sig:'WAIT',conf:3,glow:'#ffd700',
+ {mt5:'USDCAD',name:'USD/CAD',price:1.3748,sig:'WAIT',conf:3,glow:'#ffd700',validMins:240,
   entry:null,sl:null,tp1:null,tp2:null,rr:'—',waitRange:'1.3729–1.3767',
   reasons:['38-pip choppy range for 48H — exhausted market','Oil prices mixed today — CAD direction unclear','RSI(14) = 49.8 — flat as a pancake','Range must expand to 50+ pips before signal is valid','Skip completely until confirmed breakout'],
   c:[[1779253200,1.3753,1.3759,1.3746,1.3753],[1779256800,1.3747,1.3758,1.3741,1.3745],[1779264000,1.3752,1.3763,1.3745,1.3761],[1779267600,1.3761,1.3763,1.3752,1.3760],[1779271200,1.3760,1.3763,1.3749,1.3755],[1779274800,1.3755,1.3761,1.3750,1.3758],[1779278400,1.3758,1.3758,1.3746,1.3752],[1779282000,1.3752,1.3754,1.3745,1.3753],[1779285600,1.3750,1.3756,1.3746,1.3752],[1779289200,1.3752,1.3753,1.3737,1.3743],[1779292800,1.3743,1.3749,1.3735,1.3745],[1779296400,1.3745,1.3747,1.3729,1.3745],[1779300000,1.3737,1.3744,1.3732,1.3747],[1779303600,1.3743,1.3746,1.3735,1.3745],[1779307200,1.3745,1.3753,1.3736,1.3747],[1779310800,1.3746,1.3748,1.3728,1.3739],[1779314400,1.3739,1.3745,1.3731,1.3744],[1779318000,1.3744,1.3751,1.3733,1.3742],[1779321600,1.3741,1.3747,1.3736,1.3743],[1779325200,1.3743,1.3736,1.3734,1.3741],[1779328800,1.3741,1.3743,1.3734,1.3740],[1779332400,1.3740,1.3751,1.3734,1.3751],[1779336000,1.3750,1.3751,1.3733,1.3738],[1779339600,1.3738,1.3740,1.3731,1.3738],[1779343200,1.3738,1.3743,1.3735,1.3737]]},
- {mt5:'USDCHF',name:'USD/CHF',price:0.7875,sig:'SELL',conf:5,glow:'#ff3b5b',
+ {mt5:'USDCHF',name:'USD/CHF',price:0.7875,sig:'SELL',conf:5,glow:'#ff3b5b',validMins:150,
   entry:0.7885,sl:0.7912,tp1:0.7848,tp2:0.7820,rr:'1:2.4',
   reasons:['USD broadly weakening — DXY down 0.3% today','CHF safe-haven demand increasing amid uncertainty','Peaked at 0.7906 and rolling over — lower high forming','RSI(14) = 44 declining — bearish momentum','Medium conf — wait for retracement to 0.7885'],
   c:[[1779246000,0.7878,0.7880,0.7878,0.7889],[1779249600,0.7889,0.7896,0.7888,0.7905],[1779253200,0.7905,0.7906,0.7894,0.7897],[1779256800,0.7897,0.7901,0.7885,0.7889],[1779260400,0.7889,0.7892,0.7883,0.7886],[1779264000,0.7886,0.7893,0.7867,0.7892],[1779267600,0.7892,0.7892,0.7887,0.7889],[1779271200,0.7889,0.7890,0.7878,0.7888],[1779274800,0.7888,0.7894,0.7881,0.7888],[1779278400,0.7888,0.7900,0.7883,0.7893],[1779282000,0.7893,0.7901,0.7892,0.7898],[1779285600,0.7898,0.7901,0.7893,0.7898],[1779289200,0.7898,0.7900,0.7891,0.7895],[1779292800,0.7895,0.7904,0.7895,0.7900],[1779296400,0.7900,0.7905,0.7900,0.7904],[1779300000,0.7904,0.7906,0.7894,0.7905],[1779303600,0.7905,0.7906,0.7897,0.7905],[1779307200,0.7905,0.7906,0.7869,0.7873],[1779310800,0.7873,0.7876,0.7857,0.7876],[1779314400,0.7876,0.7877,0.7868,0.7872],[1779318000,0.7872,0.7879,0.7869,0.7874],[1779321600,0.7874,0.7875,0.7870,0.7871],[1779325200,0.7871,0.7872,0.7861,0.7870],[1779328800,0.7870,0.7883,0.7861,0.7880],[1779332400,0.7880,0.7884,0.7859,0.7880]]},
- {mt5:'NZDUSD',name:'NZD/USD',price:0.5877,sig:'WAIT',conf:4,glow:'#ffd700',
+ {mt5:'NZDUSD',name:'NZD/USD',price:0.5877,sig:'WAIT',conf:4,glow:'#ffd700',validMins:240,
   entry:null,sl:null,tp1:null,tp2:null,rr:'—',waitRange:'0.5840–0.5912',
   reasons:['Oversold bounce in progress — no confirmation yet','Needs 1H close above 0.5895 to confirm BUY signal','NZD GDP data due soon — avoid trading into news event','RSI(14) = 38, recovering but not bullish crossover yet','Potential BUY sets up cleanly after news clears'],
   c:[[1779138000,0.5884,0.5885,0.5882,0.5887],[1779141600,0.5886,0.5886,0.5884,0.5875],[1779145200,0.5875,0.5868,0.5862,0.5863],[1779148800,0.5862,0.5870,0.5861,0.5862],[1779152400,0.5862,0.5860,0.5861,0.5861],[1779156000,0.5861,0.5851,0.5849,0.5851],[1779159600,0.5851,0.5868,0.5846,0.5846],[1779163200,0.5846,0.5862,0.5845,0.5863],[1779166800,0.5863,0.5846,0.5845,0.5846],[1779170400,0.5846,0.5849,0.5840,0.5847],[1779174000,0.5847,0.5847,0.5841,0.5845],[1779177600,0.5845,0.5843,0.5840,0.5842],[1779181200,0.5842,0.5840,0.5840,0.5840],[1779184800,0.5840,0.5840,0.5837,0.5840],[1779188400,0.5840,0.5843,0.5832,0.5833],[1779192000,0.5833,0.5837,0.5827,0.5827],[1779195600,0.5827,0.5833,0.5825,0.5833],[1779199200,0.5833,0.5836,0.5829,0.5833],[1779202800,0.5833,0.5842,0.5834,0.5841],[1779210000,0.5840,0.5850,0.5840,0.5850],[1779213600,0.5850,0.5857,0.5847,0.5852],[1779217200,0.5852,0.5864,0.5853,0.5863],[1779220800,0.5863,0.5863,0.5859,0.5859],[1779224400,0.5859,0.5867,0.5854,0.5855],[1779228000,0.5862,0.5883,0.5864,0.5880]]}
@@ -549,11 +554,28 @@ function confDotsHTML(v){
 // ══════════════════════════════════════════════════════════════════
 // BUILD CARD
 // ══════════════════════════════════════════════════════════════════
+function getExpiryStr(d){
+  if(!d.generatedAt||!d.validMins) return null;
+  const exp=new Date(d.generatedAt + d.validMins*60000);
+  return exp.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hour12:false});
+}
+function isExpired(d){
+  if(!d.generatedAt||!d.validMins) return false;
+  return Date.now() > d.generatedAt + d.validMins*60000;
+}
+function expiryPct(d){
+  if(!d.generatedAt||!d.validMins) return 100;
+  const elapsed=Date.now()-d.generatedAt;
+  const total=d.validMins*60000;
+  return Math.max(0,Math.min(100,100-(elapsed/total*100)));
+}
+
 function buildCard(d,idx){
   const bc=d.sig==='BUY'?'buy':d.sig==='SELL'?'sell':'wait';
   const cc=confColor(d.conf);
   const cl=confLabel(d.conf);
   const isHigh=d.conf>=8;
+  const expired=isExpired(d);
   const priceStr=typeof d.price==='number'?(d.price>100?d.price.toFixed(2):d.price.toFixed(4)):d.price;
 
   let tableHTML='';
@@ -571,11 +593,16 @@ function buildCard(d,idx){
   const rArrow=openReasons[idx]?'▲':'▼';
   const rHTML=d.reasons.map(r=>`<div class="reason-item"><div class="reason-bullet"></div><span>${r}</span></div>`).join('');
 
-  return `<div class="card" style="--glow:${d.glow}" id="card-${idx}" data-sig="${d.sig}" data-conf="${d.conf}">
+  const exStr=getExpiryStr(d);
+  const ePct=expiryPct(d);
+  const eColor=ePct>50?'var(--green)':ePct>20?'var(--yellow)':'var(--red)';
+  const expiredBadge=expired?'<span class="expired-badge">EXPIRED</span>':'';
+
+  return `<div class="card${expired?' expired':''}" style="--glow:${d.glow}" id="card-${idx}" data-sig="${d.sig}" data-conf="${d.conf}">
     ${isHigh?'<div class="card-high-badge">🔥 HIGH CONF</div>':''}
     <div class="card-head">
       <div>
-        <div class="pair-name">${d.name}</div>
+        <div class="pair-name">${d.name}${expiredBadge}</div>
         <div class="pair-sub">MT5: ${d.mt5}</div>
         <div class="pair-price" id="price-${idx}">${priceStr}</div>
       </div>
@@ -596,6 +623,13 @@ function buildCard(d,idx){
       <div class="chart-box" id="chart-${idx}"></div>
     </div>
     ${tableHTML}
+    ${exStr ? `
+    <div class="expiry-row">
+      <span class="expiry-label">⏰ VALID UNTIL</span>
+      <span class="expiry-time" id="expiry-${idx}">${expired?'<span style="color:var(--red)">EXPIRED</span>':exStr+' IT'}</span>
+    </div>
+    <div class="expiry-bar-wrap"><div class="expiry-bar" id="ebar-${idx}" style="width:${ePct}%;background:${eColor}"></div></div>
+    ` : ''}
     <div>
       <button class="reasons-toggle" onclick="toggleReasons(${idx},this)">
         <span>WHY THIS SIGNAL?</span>
@@ -744,10 +778,12 @@ function updateStats(){
 // ══════════════════════════════════════════════════════════════════
 function refreshSignals(){
   SIGNALS=JSON.parse(JSON.stringify(BASE));
+  const now=Date.now();
   SIGNALS.forEach(s=>{
     const d=0.0006;
     if(typeof s.price==='number') s.price=+(s.price*(1+(Math.random()-.5)*d)).toPrecision(s.price>100?6:5);
     s.c=s.c.map(r=>{const f=1+(Math.random()-.5)*0.0003;return[r[0],+(r[1]*f).toPrecision(6),+(r[2]*f).toPrecision(6),+(r[3]*f).toPrecision(6),+(r[4]*f).toPrecision(6)];});
+    s.generatedAt=now;
   });
   signalAge=0;
   rebuildGrid();
@@ -772,15 +808,41 @@ function tick(){
   const mm=Math.floor(timeLeft/60),ss=timeLeft%60;
   document.getElementById('countdown').textContent=`${mm}:${pad(ss)}`;
   document.getElementById('refresh-bar').style.width=(timeLeft/REFRESH_SECS*100)+'%';
-  SIGNALS.forEach((_,i)=>{
+  SIGNALS.forEach((d,i)=>{
+    // age label
     const el=document.getElementById('age-'+i);
     if(el){const m=Math.floor(signalAge/60);el.textContent=m===0?'Just now':m===1?'1 min ago':m+' mins ago';}
+    // expiry bar + label live update
+    if(d.generatedAt&&d.validMins){
+      const pct=expiryPct(d);
+      const bar=document.getElementById('ebar-'+i);
+      const lbl=document.getElementById('expiry-'+i);
+      const card=document.getElementById('card-'+i);
+      const expired=isExpired(d);
+      if(bar){
+        bar.style.width=pct+'%';
+        bar.style.background=pct>50?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
+      }
+      if(lbl){
+        if(expired){
+          lbl.innerHTML='<span style="color:var(--red);animation:pulse 1s infinite">EXPIRED</span>';
+          if(card) card.classList.add('expired');
+        } else {
+          const exp=new Date(d.generatedAt+d.validMins*60000);
+          const ts=exp.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hour12:false});
+          const minsLeft=Math.ceil((d.generatedAt+d.validMins*60000-Date.now())/60000);
+          lbl.innerHTML=`${ts} IT <span style="color:var(--dim);font-size:8px">(${minsLeft}m left)</span>`;
+        }
+      }
+    }
   });
 }
 
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
+// Set generatedAt on initial load
+(()=>{ const t=Date.now(); SIGNALS.forEach(s=>{ s.generatedAt=t; }); })();
 rebuildGrid();
 updateNotifUI();
 // restore notification state
