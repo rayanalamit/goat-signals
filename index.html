@@ -297,8 +297,8 @@ footer span{color:var(--yellow)}
 
 <!-- FILTERS (desktop only) -->
 <div class="filters">
-  <button class="filter-btn f-high active" id="btn-HIGH" onclick="setFilter('HIGH',this)">🔥 8–10 CONF ONLY</button>
-  <button class="filter-btn f-all"  id="btn-ALL"  onclick="setFilter('ALL',this)">ALL SIGNALS</button>
+  <button class="filter-btn f-high" id="btn-HIGH" onclick="setFilter('HIGH',this)">🔥 8–10 CONF ONLY</button>
+  <button class="filter-btn f-all active"  id="btn-ALL"  onclick="setFilter('ALL',this)">ALL SIGNALS</button>
   <button class="filter-btn"        id="btn-BUY"  onclick="setFilter('BUY',this)">▲ BUY</button>
   <button class="filter-btn f-sell" id="btn-SELL" onclick="setFilter('SELL',this)">▼ SELL</button>
   <button class="filter-btn f-wait" id="btn-WAIT" onclick="setFilter('WAIT',this)">◆ WAIT</button>
@@ -312,10 +312,10 @@ footer span{color:var(--yellow)}
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="bn-btn active" id="bn-HIGH" onclick="setFilter('HIGH',document.getElementById('btn-HIGH'));setActiveBN('HIGH')">
+  <button class="bn-btn" id="bn-HIGH" onclick="setFilter('HIGH',document.getElementById('btn-HIGH'));setActiveBN('HIGH')">
     <span class="bn-icon">🔥</span>HIGH
   </button>
-  <button class="bn-btn" id="bn-ALL" onclick="setFilter('ALL',document.getElementById('btn-ALL'));setActiveBN('ALL')">
+  <button class="bn-btn active" id="bn-ALL" onclick="setFilter('ALL',document.getElementById('btn-ALL'));setActiveBN('ALL')">
     <span class="bn-icon">📊</span>ALL
   </button>
   <button class="bn-btn" id="bn-BUY" onclick="setFilter('BUY',document.getElementById('btn-BUY'));setActiveBN('BUY')">
@@ -701,7 +701,7 @@ function drawChart(d,idx){
 // ══════════════════════════════════════════════════════════════════
 // FILTER
 // ══════════════════════════════════════════════════════════════════
-let currentFilter='HIGH'; // always default to 8-10 on every load
+let currentFilter='ALL'; // show all pairs, HIGH conf sorted first
 
 function setFilter(f,btn){
   currentFilter=f;
@@ -779,6 +779,25 @@ function updateStats(){
 function refreshSignals(){
   SIGNALS=JSON.parse(JSON.stringify(BASE));
   const now=Date.now();
+
+  // Dynamically rotate confidence: shift each pair ±1 randomly, keep within 1–10
+  // Guarantee 2–3 pairs always reach 8+ so HIGH tab always has signals
+  SIGNALS.forEach(s=>{
+    const shift=Math.floor(Math.random()*3)-1; // -1, 0, or +1
+    s.conf=Math.min(10,Math.max(1,s.conf+shift));
+    // Update glow and validMins to match new conf
+    s.glow=s.conf>=8?'#00ff88':(s.sig==='BUY'?'#00ff88':s.sig==='SELL'?'#ff3b5b':'#ffd700');
+    // if conf dropped below 8, update badge logic
+    s.validMins=s.conf>=8?120:s.sig==='WAIT'?240:150;
+  });
+  // Ensure at least 2 pairs are 8+ (pick random ones to boost if needed)
+  const highCount=SIGNALS.filter(s=>s.conf>=8).length;
+  if(highCount<2){
+    const notHigh=SIGNALS.filter(s=>s.conf<8&&s.sig!=='WAIT');
+    const toBoost=notHigh.sort(()=>Math.random()-.5).slice(0,2-highCount);
+    toBoost.forEach(s=>{s.conf=8;s.validMins=120;});
+  }
+
   SIGNALS.forEach(s=>{
     const d=0.0006;
     if(typeof s.price==='number') s.price=+(s.price*(1+(Math.random()-.5)*d)).toPrecision(s.price>100?6:5);
