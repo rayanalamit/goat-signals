@@ -701,7 +701,7 @@ function drawChart(d,idx){
 // ══════════════════════════════════════════════════════════════════
 // FILTER
 // ══════════════════════════════════════════════════════════════════
-let currentFilter='HIGH';
+let currentFilter='HIGH'; // always default to 8-10 on every load
 
 function setFilter(f,btn){
   currentFilter=f;
@@ -804,7 +804,7 @@ function tick(){
   const italyTime=now.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
   document.getElementById('clock').textContent=`${italyTime} IT`;
   timeLeft--; signalAge++;
-  if(timeLeft<=0){ refreshSignals(); timeLeft=REFRESH_SECS; }
+  if(timeLeft<=0){ window.location.reload(); return; }
   const mm=Math.floor(timeLeft/60),ss=timeLeft%60;
   document.getElementById('countdown').textContent=`${mm}:${pad(ss)}`;
   document.getElementById('refresh-bar').style.width=(timeLeft/REFRESH_SECS*100)+'%';
@@ -844,6 +844,14 @@ function tick(){
 // Set generatedAt on initial load
 (()=>{ const t=Date.now(); SIGNALS.forEach(s=>{ s.generatedAt=t; }); })();
 rebuildGrid();
+// Flash "NEW SIGNALS" banner on load so user knows it just refreshed
+(()=>{
+  const b=document.createElement('div');
+  b.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#00ff8822;border:2px solid #00ff88;color:#00ff88;font-family:monospace;font-size:18px;font-weight:900;letter-spacing:4px;padding:18px 36px;border-radius:8px;z-index:9999;pointer-events:none;transition:opacity .6s';
+  b.textContent='⚡ NEW SIGNALS';
+  document.body.appendChild(b);
+  setTimeout(()=>{ b.style.opacity='0'; setTimeout(()=>b.remove(),700); },1200);
+})();
 updateNotifUI();
 // restore notification state
 if(Notification.permission==='granted'&&localStorage.getItem('notif')==='1'){
