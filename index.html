@@ -468,8 +468,8 @@ footer span{color:var(--yellow)}
 
 <!-- FILTERS (desktop only) -->
 <div class="filters">
-  <button class="filter-btn f-high" id="btn-HIGH" onclick="setFilter('HIGH',this)">🔥 8–10 CONF ONLY</button>
-  <button class="filter-btn f-all active"  id="btn-ALL"  onclick="setFilter('ALL',this)">ALL SIGNALS</button>
+  <button class="filter-btn f-high active" id="btn-HIGH" onclick="setFilter('HIGH',this)">🔥 8–10 CONF ONLY</button>
+  <button class="filter-btn f-all"  id="btn-ALL"  onclick="setFilter('ALL',this)">ALL SIGNALS</button>
   <button class="filter-btn"        id="btn-BUY"  onclick="setFilter('BUY',this)">▲ BUY</button>
   <button class="filter-btn f-sell" id="btn-SELL" onclick="setFilter('SELL',this)">▼ SELL</button>
   <button class="filter-btn f-wait" id="btn-WAIT" onclick="setFilter('WAIT',this)">◆ WAIT</button>
@@ -515,10 +515,10 @@ footer span{color:var(--yellow)}
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="bn-btn" id="bn-HIGH" onclick="setFilter('HIGH',document.getElementById('btn-HIGH'));setActiveBN('HIGH')">
+  <button class="bn-btn active" id="bn-HIGH" onclick="setFilter('HIGH',document.getElementById('btn-HIGH'));setActiveBN('HIGH')">
     <span class="bn-icon">🔥</span>HIGH
   </button>
-  <button class="bn-btn active" id="bn-ALL" onclick="setFilter('ALL',document.getElementById('btn-ALL'));setActiveBN('ALL')">
+  <button class="bn-btn" id="bn-ALL" onclick="setFilter('ALL',document.getElementById('btn-ALL'));setActiveBN('ALL')">
     <span class="bn-icon">📊</span>ALL
   </button>
   <button class="bn-btn" id="bn-BUY" onclick="setFilter('BUY',document.getElementById('btn-BUY'));setActiveBN('BUY')">
@@ -1117,7 +1117,7 @@ function drawChart(d,idx){
 // ══════════════════════════════════════════════════════════════════
 // FILTER
 // ══════════════════════════════════════════════════════════════════
-let currentFilter='ALL'; // show all pairs, HIGH conf sorted first
+let currentFilter='HIGH'; // default: show only 8-10 conf signals
 
 function setFilter(f,btn){
   currentFilter=f;
@@ -1359,8 +1359,17 @@ function tick(){
 // ══════════════════════════════════════════════════════════════════
 // Init — run full refresh (rotates confidence, sets generatedAt, builds grid)
 refreshSignals();
-// Init All Pairs button state
-(()=>{ const b=document.getElementById('pairs-btn'); if(b){b.classList.add('active');b.textContent='📊 All Pairs ON';} })();
+// Init: default to HIGH conf (8-10) filter
+(()=>{
+  // activate HIGH filter button
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  const hb=document.getElementById('btn-HIGH'); if(hb) hb.classList.add('active');
+  setActiveBN('HIGH');
+  applyFilter();
+  updateStatView();
+  // All Pairs button: off by default (showing HIGH only)
+  const pb=document.getElementById('pairs-btn'); if(pb){pb.classList.remove('active');pb.textContent='📊 All Pairs';}
+})();
 // Init sessions
 updateSessions();
 // Build rec-items banner with ALL pairs
