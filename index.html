@@ -46,23 +46,65 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .next-refresh span{color:var(--yellow);font-weight:700}
 
 /* ─── ACTION BUTTONS ─── */
-.action-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.notif-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
-.notif-btn:hover{border-color:var(--green);color:var(--green)}
-.notif-btn.active{background:#00ff8820;border-color:var(--green);color:var(--green)}
-.install-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #a78bfa55;background:#a78bfa15;color:var(--purple);cursor:pointer;display:none;align-items:center;gap:5px;white-space:nowrap}
-.install-btn:hover{background:#a78bfa25}
-.refresh-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #00ff8855;background:#00ff8815;color:var(--green);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
-.refresh-btn:hover{background:#00ff8830;border-color:var(--green)}
-.refresh-btn:active{transform:scale(.95)}
+.action-btns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+/* base pill */
+.action-btns button, .action-btns a{
+  padding:6px 13px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.6px;
+  border:1px solid transparent;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none;
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+.action-btns button:active{transform:scale(.94)}
+
+/* REFRESH — solid green */
+.refresh-btn{
+  background:linear-gradient(135deg,#00ff88,#00cc6e);
+  color:#0a0e14;border-color:#00ff88;
+  box-shadow:0 0 10px #00ff8840;
+}
+.refresh-btn:hover{background:linear-gradient(135deg,#1fffa0,#00ff88);box-shadow:0 0 16px #00ff8870}
 .refresh-btn.spinning svg{animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.freeze-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #ffd70055;background:transparent;color:var(--yellow);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
-.freeze-btn:hover{background:#ffd70015}
-.freeze-btn.frozen{background:#ffd70020;border-color:var(--yellow);color:var(--yellow)}
-.pairs-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
-.pairs-btn:hover{border-color:var(--purple);color:var(--purple)}
-.pairs-btn.active{background:#a78bfa20;border-color:var(--purple);color:var(--purple)}
+
+/* FREEZE — hollow yellow */
+.freeze-btn{
+  background:transparent;color:var(--yellow);
+  border-color:#ffd70066;
+  box-shadow:0 0 0 transparent;
+}
+.freeze-btn:hover{background:#ffd70018;border-color:var(--yellow);box-shadow:0 0 10px #ffd70040}
+.freeze-btn.frozen{background:#ffd70022;border-color:var(--yellow);box-shadow:0 0 12px #ffd70060}
+
+/* PAIRS — hollow purple */
+.pairs-btn{
+  background:transparent;color:#b39dfa;
+  border-color:#a78bfa55;
+}
+.pairs-btn:hover{background:#a78bfa18;border-color:#a78bfa;box-shadow:0 0 10px #a78bfa40}
+.pairs-btn.active{background:#a78bfa25;border-color:#a78bfa;color:#fff;box-shadow:0 0 12px #a78bfa50}
+
+/* ALERTS — hollow muted */
+.notif-btn{
+  background:transparent;color:var(--muted);
+  border-color:#484f5888;
+}
+.notif-btn:hover{background:#00ff8812;border-color:var(--green);color:var(--green)}
+.notif-btn.active{background:#00ff8820;border-color:var(--green);color:var(--green);box-shadow:0 0 10px #00ff8835}
+
+/* SETTINGS — hollow muted */
+.settings-btn{
+  background:transparent;color:var(--muted);
+  border-color:#484f5888;
+}
+.settings-btn:hover{background:#ffffff08;border-color:#8b949e;color:#fff}
+
+/* INSTALL — purple glow */
+.install-btn{
+  background:linear-gradient(135deg,#a78bfa,#7c5cbf);
+  color:#fff;border-color:#a78bfa;
+  display:none;box-shadow:0 0 10px #a78bfa40;
+}
+.install-btn:hover{background:linear-gradient(135deg,#b9a5ff,#a78bfa);box-shadow:0 0 16px #a78bfa70}
 
 /* ─── STATS ─── */
 .stats{padding:10px 20px 0;display:flex;gap:20px;flex-wrap:wrap}
@@ -125,20 +167,39 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;transition:box-shadow .2s,border-color .2s;display:flex;flex-direction:column;gap:9px;position:relative}
 .card:hover{box-shadow:0 0 20px var(--glow);border-color:var(--glow)}
 .card.hidden{display:none}
-.card-high-badge{position:absolute;top:-1px;right:12px;background:var(--purple);color:#fff;font-size:8px;font-weight:800;letter-spacing:1.5px;padding:2px 8px;border-radius:0 0 5px 5px}
+.card-high-badge{position:absolute;top:-1px;left:14px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);color:#fff;font-size:8px;font-weight:800;letter-spacing:1.5px;padding:2px 10px;border-radius:0 0 6px 6px;box-shadow:0 2px 8px #a78bfa40}
 @keyframes flashCard{0%{opacity:.2}100%{opacity:1}}
 .card-refreshed{animation:flashCard .5s ease}
 
 /* ─── CARD HEAD ─── */
-.card-head{display:flex;justify-content:space-between;align-items:flex-start}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .pair-name{font-size:15px;font-weight:700;font-family:monospace;color:#fff}
 .pair-sub{font-size:9px;color:var(--dim);font-family:monospace;margin-top:2px}
-.pair-price{font-size:12px;color:var(--muted);font-family:monospace;margin-top:3px}
-.right-head{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.badge{padding:3px 10px;border-radius:3px;font-size:10px;font-weight:800;letter-spacing:1.5px}
-.badge.buy{background:rgba(0,255,136,.12);color:var(--green);border:1px solid #00ff8833}
-.badge.sell{background:rgba(255,59,91,.12);color:var(--red);border:1px solid #ff3b5b33}
-.badge.wait{background:rgba(255,215,0,.10);color:var(--yellow);border:1px solid #ffd70033}
+.pair-price{font-size:22px;font-weight:800;font-family:monospace;color:#fff;margin-top:4px;letter-spacing:1px}
+.right-head{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+/* BUY/SELL/WAIT badge — large and unmissable */
+.badge{
+  padding:5px 14px;border-radius:5px;font-size:13px;font-weight:900;
+  letter-spacing:2px;display:inline-block;
+}
+.badge.buy{
+  background:linear-gradient(135deg,#00ff8830,#00ff8815);
+  color:var(--green);border:1.5px solid #00ff8860;
+  box-shadow:0 0 10px #00ff8830,inset 0 1px 0 #00ff8820;
+  text-shadow:0 0 8px #00ff88;
+}
+.badge.sell{
+  background:linear-gradient(135deg,#ff3b5b30,#ff3b5b15);
+  color:var(--red);border:1.5px solid #ff3b5b60;
+  box-shadow:0 0 10px #ff3b5b30,inset 0 1px 0 #ff3b5b20;
+  text-shadow:0 0 8px #ff3b5b;
+}
+.badge.wait{
+  background:linear-gradient(135deg,#ffd70025,#ffd70010);
+  color:var(--yellow);border:1.5px solid #ffd70055;
+  box-shadow:0 0 8px #ffd70025,inset 0 1px 0 #ffd70015;
+  text-shadow:0 0 6px #ffd700;
+}
 .sig-age{font-size:9px;color:var(--dim);font-family:monospace}
 
 /* ─── CONFIDENCE ─── */
@@ -166,11 +227,11 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .wait-box{background:#0d1117;border-radius:4px;padding:8px 10px;font-size:10px;font-family:monospace;color:var(--yellow);line-height:1.6}
 .wait-box small{color:var(--dim);font-size:9px;display:block;margin-top:3px}
 
-/* ─── PAIR ON/OFF TOGGLE ─── */
-.pair-toggle{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:5px;z-index:10}
-.toggle-switch{width:36px;height:18px;border-radius:9px;background:var(--dim);border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
-.toggle-switch::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .25s}
-.toggle-switch.on{background:var(--green)}
+/* ─── PAIR ON/OFF TOGGLE (inline, no absolute) ─── */
+.pair-toggle{display:flex;align-items:center;gap:5px}
+.toggle-switch{width:38px;height:20px;border-radius:10px;background:var(--dim);border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
+.toggle-switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.toggle-switch.on{background:var(--green);box-shadow:0 0 8px #00ff8860}
 .toggle-switch.on::after{left:20px}
 .toggle-label{font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--dim);transition:color .25s}
 .toggle-switch.on + .toggle-label{color:var(--green)}
@@ -312,7 +373,7 @@ footer span{color:var(--yellow)}
       <button class="freeze-btn" id="freeze-btn" onclick="toggleFreeze()" title="Freeze / resume auto-refresh">❄️ Freeze</button>
       <button class="pairs-btn" id="pairs-btn" onclick="toggleAllPairs()" title="Show / hide all 11 pairs">📊 All Pairs</button>
       <button class="notif-btn" id="notif-btn" onclick="toggleNotifications()">🔔 Alerts OFF</button>
-      <button class="notif-btn" onclick="openSettings()" title="Settings">⚙️</button>
+      <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️ Settings</button>
       <button class="install-btn" id="install-btn" onclick="installPWA()">📱 Install App</button>
     </div>
   </div>
@@ -919,10 +980,6 @@ function buildCard(d,idx){
   const pairOn=localStorage.getItem('pair_'+d.mt5)!=='0';
   return `<div class="card${expired?' expired':''}${!pairOn?' pair-off':''}" style="--glow:${d.glow};position:relative" id="card-${idx}" data-sig="${d.sig}" data-conf="${d.conf}" data-mt5="${d.mt5}">
     ${isHigh?'<div class="card-high-badge">🔥 HIGH CONF</div>':''}
-    <div class="pair-toggle">
-      <button class="toggle-switch${pairOn?' on':''}" id="toggle-${idx}" onclick="togglePair('${d.mt5}',${idx},this)" title="${pairOn?'Disable':'Enable'} ${d.name}"></button>
-      <span class="toggle-label">${pairOn?'ON':'OFF'}</span>
-    </div>
     <div class="card-head">
       <div>
         <div class="pair-name">${d.name}${expiredBadge}</div>
@@ -930,6 +987,10 @@ function buildCard(d,idx){
         <div class="pair-price" id="price-${idx}">${priceStr}</div>
       </div>
       <div class="right-head">
+        <div class="pair-toggle">
+          <button class="toggle-switch${pairOn?' on':''}" id="toggle-${idx}" onclick="togglePair('${d.mt5}',${idx},this)" title="${pairOn?'Disable':'Enable'} ${d.name}"></button>
+          <span class="toggle-label">${pairOn?'ON':'OFF'}</span>
+        </div>
         <span class="badge ${bc}">${d.sig}</span>
         <span class="sig-age" id="age-${idx}">Just now</span>
       </div>
