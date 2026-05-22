@@ -765,7 +765,8 @@ function pad(n){return String(n).padStart(2,'0');}
 
 function tick(){
   const now=new Date();
-  document.getElementById('clock').textContent=`${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} UTC`;
+  const italyTime=now.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  document.getElementById('clock').textContent=`${italyTime} IT`;
   timeLeft--; signalAge++;
   if(timeLeft<=0){ refreshSignals(); timeLeft=REFRESH_SECS; }
   const mm=Math.floor(timeLeft/60),ss=timeLeft%60;
