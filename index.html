@@ -166,6 +166,17 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .wait-box{background:#0d1117;border-radius:4px;padding:8px 10px;font-size:10px;font-family:monospace;color:var(--yellow);line-height:1.6}
 .wait-box small{color:var(--dim);font-size:9px;display:block;margin-top:3px}
 
+/* ─── PAIR ON/OFF TOGGLE ─── */
+.pair-toggle{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:5px;z-index:10}
+.toggle-switch{width:36px;height:18px;border-radius:9px;background:var(--dim);border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
+.toggle-switch::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .25s}
+.toggle-switch.on{background:var(--green)}
+.toggle-switch.on::after{left:20px}
+.toggle-label{font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--dim);transition:color .25s}
+.toggle-switch.on + .toggle-label{color:var(--green)}
+.card.pair-off{opacity:.25;filter:grayscale(.8);pointer-events:none}
+.card.pair-off .pair-toggle{pointer-events:all;opacity:1;filter:none}
+
 /* ─── EXPIRY ─── */
 .expiry-row{display:flex;align-items:center;justify-content:space-between;margin:6px 0 4px;padding:5px 8px;border-radius:4px;background:#0d1117;font-family:monospace;font-size:9px}
 .expiry-label{color:var(--dim);letter-spacing:.5px}
@@ -342,12 +353,11 @@ footer span{color:var(--yellow)}
     </div>
   </div>
   <div class="rec-box">
-    <div class="rec-title">⚡ ACTIVE HIGH-CONF TRADES (8–10 only)</div>
-    <div id="rec-items">
-      <div class="rec-item"><div class="rec-dot" style="background:var(--red)"></div><div><b>USDJPY SELL</b> · Entry 159.10 · SL 159.35 · TP 158.20 · <span style="color:var(--purple)">8/10</span></div></div>
-      <div class="rec-item"><div class="rec-dot" style="background:var(--red)"></div><div><b>EURGBP SELL</b> · Entry 0.8650 · SL 0.8678 · TP 0.8590 · <span style="color:var(--purple)">8/10</span></div></div>
-      <div class="rec-item"><div class="rec-dot" style="background:var(--green)"></div><div><b>NAS100.CASH BUY</b> · Entry 29200 · SL 28900 · TP 29750 · <span style="color:var(--purple)">8/10</span></div></div>
+    <div class="rec-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span>📊 ALL ACTIVE SIGNALS</span>
+      <span id="rec-count" style="font-size:9px;color:var(--dim)"></span>
     </div>
+    <div id="rec-items"></div>
   </div>
 </div>
 
@@ -920,8 +930,13 @@ function buildCard(d,idx){
   const eColor=ePct>50?'var(--green)':ePct>20?'var(--yellow)':'var(--red)';
   const expiredBadge=expired?'<span class="expired-badge">EXPIRED</span>':'';
 
-  return `<div class="card${expired?' expired':''}" style="--glow:${d.glow}" id="card-${idx}" data-sig="${d.sig}" data-conf="${d.conf}">
+  const pairOn=localStorage.getItem('pair_'+d.mt5)!=='0';
+  return `<div class="card${expired?' expired':''}${!pairOn?' pair-off':''}" style="--glow:${d.glow};position:relative" id="card-${idx}" data-sig="${d.sig}" data-conf="${d.conf}" data-mt5="${d.mt5}">
     ${isHigh?'<div class="card-high-badge">🔥 HIGH CONF</div>':''}
+    <div class="pair-toggle">
+      <button class="toggle-switch${pairOn?' on':''}" id="toggle-${idx}" onclick="togglePair('${d.mt5}',${idx},this)" title="${pairOn?'Disable':'Enable'} ${d.name}"></button>
+      <span class="toggle-label">${pairOn?'ON':'OFF'}</span>
+    </div>
     <div class="card-head">
       <div>
         <div class="pair-name">${d.name}${expiredBadge}</div>
@@ -1149,6 +1164,7 @@ function refreshSignals(){
   signalAge=0;
   rebuildGrid();
   document.querySelectorAll('.card').forEach(c=>{c.classList.remove('card-refreshed');void c.offsetWidth;c.classList.add('card-refreshed');});
+  updateRecItems();
   fireNotifications();
 }
 
@@ -1165,6 +1181,38 @@ function manualRefresh(){
   btn.classList.add('spinning');
   setTimeout(()=>{ btn.classList.remove('spinning'); },600);
   window.location.reload();
+}
+
+// ── Pair ON/OFF toggle ──
+function togglePair(mt5, idx, btn){
+  const isOn = btn.classList.contains('on');
+  const newState = !isOn;
+  localStorage.setItem('pair_'+mt5, newState?'1':'0');
+  btn.classList.toggle('on', newState);
+  const lbl = btn.nextElementSibling;
+  if(lbl){ lbl.textContent = newState?'ON':'OFF'; }
+  const card = document.getElementById('card-'+idx);
+  if(card){ card.classList.toggle('pair-off', !newState); }
+  updateRecItems();
+}
+
+// ── Rebuild the ALL SIGNALS summary banner ──
+function updateRecItems(){
+  const box = document.getElementById('rec-items');
+  const cnt = document.getElementById('rec-count');
+  if(!box) return;
+  const active = SIGNALS.filter(s=>localStorage.getItem('pair_'+s.mt5)!=='0');
+  const f = v=>typeof v==='number'?(v>100?v.toFixed(2):v.toFixed(4)):v;
+  box.innerHTML = active.map(d=>{
+    const col = d.sig==='BUY'?'var(--green)':d.sig==='SELL'?'var(--red)':'var(--yellow)';
+    const e = d.sig==='BUY'?'🟢':d.sig==='SELL'?'🔴':'🟡';
+    const detail = d.sig!=='WAIT'
+      ? `Entry <b>${f(d.entry)}</b> · SL <b style="color:var(--red)">${f(d.sl)}</b> · TP <b style="color:var(--green)">${f(d.tp1)}</b>`
+      : `Range <b>${d.waitRange||'—'}</b>`;
+    const highBadge = d.conf>=8?`<span style="background:#00ff8820;border:1px solid #00ff8844;color:var(--green);font-size:8px;padding:1px 5px;border-radius:3px;margin-left:4px">🔥${d.conf}/10</span>`:`<span style="color:var(--dim);font-size:9px;margin-left:4px">${d.conf}/10</span>`;
+    return `<div class="rec-item"><div class="rec-dot" style="background:${col}"></div><div style="font-size:10px">${e} <b>${d.mt5}</b>${highBadge} · ${detail}</div></div>`;
+  }).join('');
+  if(cnt) cnt.textContent = `${active.length}/11 pairs ON`;
 }
 
 function toggleFreeze(){
@@ -1255,6 +1303,8 @@ rebuildGrid();
 updateSessions();
 // Init Groq key check
 checkGroqKey();
+// Build rec-items banner with ALL pairs
+updateRecItems();
 // Flash "NEW SIGNALS" banner on load so user knows it just refreshed
 (()=>{
   const b=document.createElement('div');
