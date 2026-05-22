@@ -413,15 +413,11 @@ footer span{color:var(--yellow)}
 <button id="ai-chat-btn" onclick="toggleAIChat()" title="AI Signal Analyst">🤖</button>
 <div id="ai-chat-panel">
   <div class="ai-chat-header">
-    <div class="ai-chat-title">🤖 AI SIGNAL ANALYST <span style="font-size:9px;color:var(--dim);font-weight:400">(Groq · Llama 3.3 70B)</span></div>
+    <div class="ai-chat-title">🤖 AI SIGNAL ANALYST <span style="font-size:9px;color:var(--green);font-weight:400">● FREE · NO KEY NEEDED</span></div>
     <button class="ai-close-btn" onclick="toggleAIChat()">✕</button>
   </div>
-  <div class="ai-key-row" id="ai-key-row">
-    <input class="ai-key-input" id="ai-key-input" type="password" placeholder="Paste free Groq API key (console.groq.com)"/>
-    <button class="ai-key-save" onclick="saveGroqKey()">SAVE</button>
-  </div>
   <div id="ai-messages">
-    <div class="ai-msg bot">👋 Hi! I'm your AI trading analyst powered by <b>Llama 3.3 70B</b> (free via Groq).<br><br>Ask me anything:<br>• "Analyse USDJPY signal"<br>• "Which signal is safest?"<br>• "What's the market doing?"<br><br>Add your free Groq key above to start.</div>
+    <div class="ai-msg bot">👋 Hi! I'm your <b>GOAT AI Analyst</b> — ready instantly, no setup needed.<br><br>Ask me anything:<br>• "Analyse USDJPY signal"<br>• "Which signal is safest right now?"<br>• "Explain EURGBP sell"<br>• "Best pair to trade now?"</div>
   </div>
   <div class="ai-input-row">
     <input class="ai-text-input" id="ai-text-input" placeholder="Ask about any signal..." onkeydown="if(event.key==='Enter')sendAIMessage()"/>
@@ -434,9 +430,8 @@ footer span{color:var(--yellow)}
   <div class="settings-box">
     <div class="settings-title">⚙️ SETTINGS <button class="settings-close" onclick="closeSettings()">✕</button></div>
     <div class="settings-row">
-      <label class="settings-label">🤖 GROQ AI API KEY (Free — console.groq.com)</label>
-      <input class="settings-input" id="settings-groq-key" type="password" placeholder="gsk_..."/>
-      <div style="font-size:9px;color:var(--dim);margin-top:4px">Get free key at console.groq.com → sign up → API Keys</div>
+      <label class="settings-label">🤖 AI ENGINE</label>
+      <div style="font-size:10px;color:var(--green);padding:6px 0">✅ Powered by Pollinations AI — free, no key needed</div>
     </div>
     <div class="settings-row">
       <label class="settings-label">💰 ACCOUNT SIZE (for position calculator)</label>
@@ -633,68 +628,59 @@ function updateSessions(){
 // SETTINGS & GROQ AI
 // ══════════════════════════════════════════════════════════════════
 function openSettings(){
-  document.getElementById('settings-groq-key').value=localStorage.getItem('groqKey')||'';
   document.getElementById('settings-account').value=localStorage.getItem('accountSize')||'';
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings(){ document.getElementById('settings-modal').classList.remove('open'); }
 function saveSettings(){
-  const key=document.getElementById('settings-groq-key').value.trim();
   const acc=document.getElementById('settings-account').value.trim();
-  if(key) localStorage.setItem('groqKey',key);
   if(acc) localStorage.setItem('accountSize',acc);
   closeSettings();
   showToast('✅ Settings saved');
-  checkGroqKey();
-}
-function saveGroqKey(){
-  const key=document.getElementById('ai-key-input').value.trim();
-  if(key){ localStorage.setItem('groqKey',key); checkGroqKey(); showToast('✅ AI key saved'); }
-}
-function checkGroqKey(){
-  const k=localStorage.getItem('groqKey');
-  const row=document.getElementById('ai-key-row');
-  if(k&&row) row.style.display='none';
 }
 
 function toggleAIChat(){
-  const p=document.getElementById('ai-chat-panel');
-  p.classList.toggle('open');
-  if(p.classList.contains('open')) checkGroqKey();
+  document.getElementById('ai-chat-panel').classList.toggle('open');
 }
 
 async function sendAIMessage(){
   const inp=document.getElementById('ai-text-input');
   const text=inp.value.trim(); if(!text) return;
   inp.value='';
-  const key=localStorage.getItem('groqKey');
-  if(!key){ appendAIMsg('bot','⚠️ Please add your free Groq API key first (⚙️ Settings or the key field above).'); return; }
 
   appendAIMsg('user',text);
-  const thinking=appendAIMsg('bot','⏳ Analysing...','thinking');
+  const thinking=appendAIMsg('bot','⏳ Analysing market...','thinking');
 
-  // Build context from current signals
-  const ctx=SIGNALS.filter(s=>s.conf>=7).map(s=>`${s.mt5}: ${s.sig} conf=${s.conf}/10 entry=${s.entry} sl=${s.sl} tp1=${s.tp1} rr=${s.rr}`).join('\n');
-  const sysPrompt=`You are GOAT AI, an expert forex trading analyst for a prop firm called GOAT Funded. You analyse signals concisely and professionally. Current high-confidence signals:\n${ctx}\nAccount rules: 8-10 conf = 0.5% risk, 4-7 conf = 0.25% risk. Always be direct and concise. Max 3 sentences.`;
+  // Build full signal context
+  const ctx=SIGNALS.map(s=>{
+    const f=v=>typeof v==='number'?(v>100?v.toFixed(2):v.toFixed(4)):v;
+    return s.sig!=='WAIT'
+      ? `${s.mt5}: ${s.sig} ${s.conf}/10 | Entry ${f(s.entry)} SL ${f(s.sl)} TP1 ${f(s.tp1)} RR ${s.rr}`
+      : `${s.mt5}: WAIT ${s.conf}/10 | Range ${s.waitRange}`;
+  }).join('\n');
+
+  const sysPrompt=`You are GOAT AI, a professional forex trading analyst for GOAT Funded prop firm traders. Be direct, concise, max 3 sentences. Current live signals:\n${ctx}\nRules: 8-10 conf = 0.5% risk (full), 4-7 = 0.25% (half), 1-3 = skip.`;
 
   try{
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const res=await fetch('https://text.pollinations.ai/',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        messages:[{role:'system',content:sysPrompt},{role:'user',content:text}],
-        max_tokens:200, temperature:0.7
+        messages:[
+          {role:'system',content:sysPrompt},
+          {role:'user',content:text}
+        ],
+        model:'openai-large',
+        seed:42,
+        jsonMode:false
       })
     });
-    const data=await res.json();
-    if(data.choices?.[0]?.message?.content){
-      thinking.textContent=data.choices[0].message.content;
-      thinking.classList.remove('thinking');
-    } else {
-      thinking.textContent='❌ Error: '+(data.error?.message||'Check your API key.');
-    }
-  } catch(e){ thinking.textContent='❌ Network error. Try again.'; }
+    const reply=await res.text();
+    thinking.textContent=reply||'No response. Try again.';
+    thinking.classList.remove('thinking');
+  } catch(e){
+    thinking.textContent='❌ Connection error. Check internet and try again.';
+  }
 }
 
 function appendAIMsg(role,text,cls=''){
