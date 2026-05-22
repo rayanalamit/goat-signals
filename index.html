@@ -557,7 +557,7 @@ function confDotsHTML(v){
 function getExpiryStr(d){
   if(!d.generatedAt||!d.validMins) return null;
   const exp=new Date(d.generatedAt + d.validMins*60000);
-  return exp.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hour12:false});
+  return exp.toLocaleTimeString('en-US',{timeZone:'Europe/Rome',hour:'numeric',minute:'2-digit',hour12:true});
 }
 function isExpired(d){
   if(!d.generatedAt||!d.validMins) return false;
@@ -801,7 +801,7 @@ function pad(n){return String(n).padStart(2,'0');}
 
 function tick(){
   const now=new Date();
-  const italyTime=now.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const italyTime=now.toLocaleTimeString('en-US',{timeZone:'Europe/Rome',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
   document.getElementById('clock').textContent=`${italyTime} IT`;
   timeLeft--; signalAge++;
   if(timeLeft<=0){ window.location.reload(); return; }
@@ -829,7 +829,7 @@ function tick(){
           if(card) card.classList.add('expired');
         } else {
           const exp=new Date(d.generatedAt+d.validMins*60000);
-          const ts=exp.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hour12:false});
+          const ts=exp.toLocaleTimeString('en-US',{timeZone:'Europe/Rome',hour:'numeric',minute:'2-digit',hour12:true});
           const minsLeft=Math.ceil((d.generatedAt+d.validMins*60000-Date.now())/60000);
           lbl.innerHTML=`${ts} IT <span style="color:var(--dim);font-size:8px">(${minsLeft}m left)</span>`;
         }
